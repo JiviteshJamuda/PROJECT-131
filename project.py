@@ -1,23 +1,27 @@
 import csv
+import pandas as pd
 
-df = []
-with open('final.csv') as f:
-    reader = csv.reader(f)
-    for row in reader:
-        df.append(row)
+df = pd.read_csv('final.csv')
+df.drop(['Unnamed: 0'],axis=1,inplace=True)
+# print(df.head())
+# print(df.shape)
+# print(df.dtypes)
 
-header = df[0]
-planet_data_rows = df[1:]
+radius = df['radius'].to_list()
+mass = df['mass'].to_list()
+gravity =[]
 
-planet_masses = []
-planet_radiuses = []
-planet_names = []
-for planet_data in planet_data_rows:
-    planet_masses.append(planet_data[3])
-    planet_radiuses.append(planet_data[4])
-    planet_names.append(planet_data[1])
-planet_gravity = []
+for i in range(0,len(radius)):
+    radius[i] = radius[i]*6.957e+8
+    mass[i] = mass[i]*1.989e+30
 
-for index, name in enumerate(planet_names):
-    gravity = (float(planet_masses[index])*1.989e+30) /(float(planet_radiuses[index])*float(planet_radiuses[index])*6.957e+8*6.957e+8) * 6.674e-11
-    planet_gravity.append(gravity)
+def gravity_calculation(radius,mass):
+    G = 6.674e-11
+    for index in range(0,len(mass)):
+        g = (mass[index]*G)/((radius[index])**2)
+        gravity.append(g)
+
+gravity_calculation(radius,mass)
+df["gravity"] = gravity
+# print(df.head())
+df.to_csv('data.csv')
